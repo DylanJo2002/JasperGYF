@@ -35,12 +35,6 @@ public class AmparoSource implements JRDataSource{
 	@PostConstruct
 	private void init() {
 		amparos = new ArrayList<AmparoEntity>();
-		amparoRepository.findAll().forEach(amp -> amparos.add(amp));
-		
-		if(amparos.size() == 0) {
-			amparos.add(new AmparoEntity());
-		}
-		
 		index = -1;
 	}
 
@@ -67,4 +61,15 @@ public class AmparoSource implements JRDataSource{
 		return valor;
 	}
 	
+	
+	public void resetInfo() {
+		amparos.clear();
+		amparoRepository.findAll().forEach(sede -> amparos.add(sede));
+		
+		if(amparos.size() == 0) {
+			amparos.add(new AmparoEntity());
+		}
+		
+		index = -1;
+	}
 }

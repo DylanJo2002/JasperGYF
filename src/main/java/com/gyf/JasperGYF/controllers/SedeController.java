@@ -71,6 +71,7 @@ public class SedeController {
 	}
 	
 	public JasperPrint getCondicionesPDF() throws JRException {	
+		amparoSource.resetInfo();
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("subreport_c1", jasperFileKeys.condiciones_1);
 		parameters.put("subreport_c2", jasperFileKeys.condiciones_2);
@@ -85,6 +86,7 @@ public class SedeController {
 	}
 	
 	public JasperPrint getDatosPdf() throws JRException {
+		beneficiarioSource.resetInfo();
 		Map<String, Object> parameters = key.getKeys();
 		parameters.put("beneficiarios_subreport", jasperFileKeys.beneficiarios);
 		parameters.put("amparo_subreport", jasperFileKeys.amparos);

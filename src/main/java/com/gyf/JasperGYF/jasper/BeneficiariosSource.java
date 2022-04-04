@@ -33,12 +33,6 @@ public class BeneficiariosSource implements JRDataSource{
 	@PostConstruct
 	private void init() {
 		sedes = new ArrayList<SedeEntity>();
-		sedeRepository.findAll().forEach(sede -> sedes.add(sede));
-		
-		if(sedes.size() == 0) {
-			sedes.add(new SedeEntity());
-		}
-		
 		index = -1;
 	}
 
@@ -82,4 +76,14 @@ public class BeneficiariosSource implements JRDataSource{
 		return valor;
 	}
 	
+	public void resetInfo() {
+		sedes.clear();
+		sedeRepository.findAll().forEach(sede -> sedes.add(sede));
+		
+		if(sedes.size() == 0) {
+			sedes.add(new SedeEntity());
+		}
+		
+		index = -1;
+	}
 }
