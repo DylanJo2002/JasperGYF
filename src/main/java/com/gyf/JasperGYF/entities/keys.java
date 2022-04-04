@@ -22,7 +22,7 @@ public class keys {
 	private String cobro;
 	@Value("${descripcionAgencia}")
 	private String descripcionAgencia;
-	@Value("${asesor}")
+	@Value("${cobroTransaccion}")
 	private String cobroTransaccion;
 	@Value("${fechaExpedicion}")
 	private String fechaExpedicion;

@@ -85,7 +85,7 @@ public class SedeController {
 	}
 	
 	public JasperPrint getDatosPdf() throws JRException {
-		Map<String, Object> parameters = new HashMap<String, Object>();
+		Map<String, Object> parameters = key.getKeys();
 		parameters.put("beneficiarios_subreport", jasperFileKeys.beneficiarios);
 		parameters.put("amparo_subreport", jasperFileKeys.amparos);
 		parameters.put("beneficiarios_source", beneficiarioSource);
