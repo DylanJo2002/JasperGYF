@@ -1,12 +1,18 @@
 package com.gyf.JasperGYF.controllers;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gyf.JasperGYF.entities.JasperFileKeys;
 import com.gyf.JasperGYF.entities.SedeEntity;
-import com.gyf.JasperGYF.jasper.JasperSede;
+import com.gyf.JasperGYF.entities.keys;
+import com.gyf.JasperGYF.jasper.AmparoSource;
+import com.gyf.JasperGYF.jasper.BeneficiariosSource;
 import com.gyf.JasperGYF.respositories.SedeRepository;
 
 import net.sf.jasperreports.engine.JREmptyDataSource;
@@ -33,9 +41,15 @@ import net.sf.jasperreports.engine.util.JRLoader;
 public class SedeController {
 	
 	@Autowired
-	private JasperSede jasperSede;
+	private BeneficiariosSource beneficiarioSource;
+	@Autowired
+	private AmparoSource amparoSource;
 	@Autowired
 	private JasperFileKeys jasperFileKeys;
+	private String uuidCondiciones;
+	private String uuidMain;
+	@Autowired
+	private keys key;
 	@GetMapping
 	public void getPDF() throws IOException {
 
@@ -48,20 +62,15 @@ public class SedeController {
 //			JasperPrint print = JasperFillManager.fillReport(jasper, null,new JREmptyDataSource());
 //
 //			JasperExportManager.exportReportToPdfFile(print, "C:/Users/dbergano/Desktop/certificados/report.pdf");
-			
-			JasperPrint print = getCondicionesPDF();
-			JasperExportManager.exportReportToPdfFile(print,"C:/Users/dbergano/Desktop/certificados/report.pdf");
-			
-		}catch(JRException e) {
+			createTempPDFs();
+			mergePdfTemps();
 
+		}catch(JRException e) {
+			System.out.println("Error");
 		}
 	}
 	
-	public JasperPrint getCondicionesPDF() throws JRException {
-//		JasperReport subreport_c1 = (JasperReport) JRLoader.loadObjectFromFile(jasperFileKeys.condiciones_1);
-//		JasperReport subreport_c2 = (JasperReport) JRLoader.loadObjectFromFile(jasperFileKeys.condiciones_2);
-//		JasperReport subreport_c3 = (JasperReport) JRLoader.loadObjectFromFile(jasperFileKeys.condiciones_3);
-//		
+	public JasperPrint getCondicionesPDF() throws JRException {	
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("subreport_c1", jasperFileKeys.condiciones_1);
 		parameters.put("subreport_c2", jasperFileKeys.condiciones_2);
@@ -75,5 +84,41 @@ public class SedeController {
 		return print;
 	}
 	
+	public JasperPrint getDatosPdf() throws JRException {
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put("beneficiarios_subreport", jasperFileKeys.beneficiarios);
+		parameters.put("amparo_subreport", jasperFileKeys.amparos);
+		parameters.put("beneficiarios_source", beneficiarioSource);
+		parameters.put("amparo_source", amparoSource);
+		parameters.put("logo_url", jasperFileKeys.logo_report);
+		parameters.put("firma_report",jasperFileKeys.firma_report);
+		JasperReport jasper = (JasperReport) JRLoader.loadObject(new File(jasperFileKeys.main_report));	
+		
+		JasperPrint print = JasperFillManager.fillReport(jasper, parameters,new JREmptyDataSource());
+		return print;
+	}
 
+	public void createTempPDFs() throws JRException {
+		uuidCondiciones = UUID.randomUUID().toString();
+		uuidMain = UUID.randomUUID().toString();
+		JasperPrint print_condiciones = getCondicionesPDF();
+		JasperPrint print_main = getDatosPdf();
+		JasperExportManager.exportReportToPdfFile(print_condiciones, jasperFileKeys.base_certificados
+				+"/temp/"+uuidCondiciones+".pdf");
+		JasperExportManager.exportReportToPdfFile(print_main, jasperFileKeys.base_certificados
+				+"/temp/"+uuidMain+".pdf");
+	}
+
+	public void mergePdfTemps() throws IOException {
+		File condiciones = new File(jasperFileKeys.base_certificados+"/temp/"+uuidCondiciones+".pdf");
+		File main = new File(jasperFileKeys.base_certificados+"/temp/"+uuidMain+".pdf");
+
+		PDFMergerUtility pdm = new PDFMergerUtility();
+		
+		pdm.addSource(main);
+		pdm.addSource(condiciones);
+		
+		pdm.setDestinationFileName(jasperFileKeys.base_certificados+key.getNumeroDocumento()+".pdf");
+		pdm.mergeDocuments(null);
+	}
 }

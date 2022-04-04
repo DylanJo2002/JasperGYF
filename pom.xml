@@ -53,6 +53,11 @@
 			<artifactId>jasperreports-fonts</artifactId>
 			<version>6.18.1</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.pdfbox</groupId>
+		    <artifactId>pdfbox</artifactId>
+		    <version>3.0.0-alpha2</version>
+		</dependency>
 		
 	</dependencies>
 

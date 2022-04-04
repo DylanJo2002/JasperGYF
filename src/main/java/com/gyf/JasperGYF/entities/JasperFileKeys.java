@@ -15,4 +15,14 @@ public class JasperFileKeys {
 	public String condiciones_3;
 	@Value("${base_files}${logo_report}")
 	public String logo_report;
+	@Value("${base_files}${amparos_report}")
+	public String amparos;
+	@Value("${base_files}${beneficiarios_report}")
+	public String beneficiarios;
+	@Value("${base_files}${main_report}")
+	public String main_report;
+	@Value("${base_files}${firma_report}")
+	public String firma_report;
+	@Value("${base_certificados}")
+	public String base_certificados;
 }

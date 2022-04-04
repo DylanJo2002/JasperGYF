@@ -10,8 +10,10 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.gyf.JasperGYF.entities.AmparoEntity;
 import com.gyf.JasperGYF.entities.SedeEntity;
 import com.gyf.JasperGYF.entities.keys;
+import com.gyf.JasperGYF.respositories.AmparoRepository;
 import com.gyf.JasperGYF.respositories.SedeRepository;
 
 import net.sf.jasperreports.engine.JRDataSource;
@@ -19,24 +21,24 @@ import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRField;
 
 @Component
-public class JasperSede implements JRDataSource{
+public class AmparoSource implements JRDataSource{
 	
-	private List<SedeEntity> sedes;
+	private List<AmparoEntity> amparos;
 	private int index;
 	
 	
 	@Autowired
-	private SedeRepository sedeRepository;
+	private AmparoRepository amparoRepository;
 	@Autowired
 	private keys keys;
 	
 	@PostConstruct
 	private void init() {
-		sedes = new ArrayList<SedeEntity>();
-		sedeRepository.findAll().forEach(sede -> sedes.add(sede));
+		amparos = new ArrayList<AmparoEntity>();
+		amparoRepository.findAll().forEach(amp -> amparos.add(amp));
 		
-		if(sedes.size() == 0) {
-			sedes.add(new SedeEntity());
+		if(amparos.size() == 0) {
+			amparos.add(new AmparoEntity());
 		}
 		
 		index = -1;
@@ -45,7 +47,7 @@ public class JasperSede implements JRDataSource{
 	@Override
 	public boolean next() throws JRException {
 		index++;
-		return index<sedes.size();
+		return index<amparos.size();
 	}
 
 	@Override
@@ -54,36 +56,15 @@ public class JasperSede implements JRDataSource{
 		Object valor = null;
 		String fieldName = jrField.getName();
 		
-		SedeEntity sede = sedes.get(index);
+		AmparoEntity amparo = amparos.get(index);
 		
 		switch(fieldName) {
-			case "t_nombres": 
-				valor = sede.getNombres();
-				break;
-				
-			case "t_parentesco": 
-				valor = sede.getParentesco();
-				break;
-				
-			case "t_porcentaje": 
-				valor = sede.getPorcentaje();
-				break;
-				
-			case "t_edad": 
-				valor = sede.getEdad();
-				break;
-				
-			case "t_pais": 
-				valor = sede.getPais();
+			case "amparo": 
+				valor = amparo.getAmparo();
 				break;			
-			
 		}
 		
 		return valor;
 	}
 	
-	public Map<String, Object> getKeys(){
-		return keys.getKeys();
-	}
-
 }
